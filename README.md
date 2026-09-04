@@ -1,129 +1,165 @@
-# 🏛️ HACOM LEGAL COPILOT — HỆ THỐNG TRA CỨU PHÁP LÝ & CẢNH BÁO TÁC ĐỘNG DỰ ÁN
-> **Tập đoàn HACOM Holdings** | Enterprise Legal AI Copilot (RAG & Knowledge Graph)
+# ⚖️ HACOM LEGAL COPILOT — HỆ THỐNG TRỢ LÝ PHÁP LÝ & THẨM ĐỊNH DỰ ÁN AI
+> **TẬP ĐOÀN HACOM HOLDINGS** | Enterprise Legal AI Copilot (RAG & Knowledge Graph)  
+> **Model Core:** `Qwen/Qwen3.8-27B-FP8` (Hạ tầng Máy chủ AI Nội bộ Tập đoàn HACOM)
 
 ---
 
-## ⚡ HƯỚNG DẪN KHỞI ĐỘNG NHANH TRONG 3 BƯỚC (QUICK START)
+## 🌟 TỔNG QUAN HỆ THỐNG
 
-Dành cho người mới hoặc nhân sự chuyển giao dự án, thực hiện tuần tự 3 bước sau:
+**HACOM Legal Copilot** là nền tảng Trí tuệ Nhân tạo chuyên biệt phục vụ công tác tra cứu, thẩm định và đánh giá rủi ro pháp lý cho các dự án đầu tư trọng điểm của Tập đoàn HACOM Holdings (Khu đô thị, Nhà ở xã hội, Năng lượng tái tạo, Bất động sản nghỉ dưỡng, Cụm công nghiệp).
 
-### 🔹 BƯỚC 1: Cài đặt môi trường & Thư viện
-Mở **Terminal / PowerShell** tại thư mục dự án:
+Hệ thống kết hợp **Kiến trúc RAG 4 lớp có kiểm chứng (Verified RAG)** với **Đồ thị Tri thức Pháp lý (Legal Knowledge Graph)** và kết nối trực tiếp với cụm máy chủ **AI nội bộ của HACOM Holdings**, đảm bảo:
+* 🔒 **Bảo mật tuyệt đối**: Dữ liệu không gửi ra ngoài Internet; vận hành qua Cổng AI nội bộ của Tập đoàn.
+* 🎯 **Chính xác & Trực diện**: 100% câu trả lời đều trích dẫn chính xác Điều, Khoản, Điểm và Văn bản quy phạm pháp luật áp dụng.
+* ⚡ **Xử lý xung đột pháp luật**: Tự động xác định thứ bậc hiệu lực pháp lý theo **Điều 156 Luật Ban hành VBQPPL 2015**.
 
-```powershell
-# 1. Di chuyển vào thư mục dự án
-cd C:\KHMT\HacomHoldings\HacomLegalCopilot
+---
 
-# 2. Tạo và kích hoạt môi trường ảo Python (nếu chưa có)
+## 🚀 HƯỚNG DẪN CÀI ĐẶT & KHỞI CHẠY (QUICK START)
+
+### 1️⃣ Cài đặt Môi trường & Thư viện
+
+```bash
+# Di chuyển vào thư mục dự án
+cd HacomLegalCopilot
+
+# Tạo và kích hoạt môi trường ảo
 python -m venv .venv
+
+# Trên Windows:
 .\.venv\Scripts\activate
 
-# 3. Cài đặt các thư viện cần thiết
+# Trên Linux/Ubuntu Server:
+source .venv/bin/activate
+
+# Cài đặt các thư viện cần thiết
 pip install -r requirements.txt
 ```
-*(Nếu máy đã có sẵn môi trường Conda `HacomKTKT`, bạn có thể dùng trực tiếp: `C:\KHMT\HacomHolding\HacomKTKT\.conda-env\python.exe -m pip install -r requirements.txt`)*
 
 ---
 
-### 🔹 BƯỚC 2: Mở kết nối SSH Tunnel tới Server GPU (Chạy ở 1 Terminal riêng)
-Hệ thống sử dụng mô hình ngôn ngữ lớn **Qwen3:8b** đặt tại máy chủ GPU doanh nghiệp. Hãy mở một cửa sổ **PowerShell riêng** và chạy lệnh:
+### 2️⃣ Cấu hình Biến Môi trường (`.env`)
 
-```powershell
-ssh -N -L 50050:localhost:11434 k16khmt-binh@118.70.169.236
+Tạo hoặc chỉnh sửa file `.env` tại thư mục gốc của dự án:
+
+```ini
+# ==============================================================================
+# CỔNG AI NỘI BỘ TẬP ĐOÀN HACOM (Qwen3.8-27B-FP8)
+# ==============================================================================
+HACOM_LLM_URL=https://ai.hacomholdings.com.vn/api/llm/v1
+HACOM_LLM_KEY=291dbde4a94cfd5995fbc636f58746864067ac8f3b078118b5e9374fb54f4e4c
+HACOM_LEGAL_MODEL=Qwen/Qwen3.8-27B-FP8
+HACOM_LLM_TIMEOUT=180
+
+# Cấu hình dự phòng Local (nếu offline)
+OLLAMA_HOST=http://localhost:11434
 ```
-> 💡 *Nhập mật khẩu SSH của server khi được yêu cầu. Giữ nguyên cửa sổ này chạy ngầm trong suốt thời gian sử dụng.*
+
+Kiểm tra kết nối tới Cổng AI HACOM bằng lệnh:
+```bash
+python test_company_llm.py
+```
+*(Nếu nhận được mã HTTP 200 và phản hồi từ model `Qwen/Qwen3.8-27B-FP8` là kết nối thành công 100%).*
 
 ---
 
-### 🔹 BƯỚC 3: Khởi chạy Máy chủ Web Dashboard
+### 3️⃣ Khởi chạy Ứng dụng
 
-Bạn có thể chọn **1 trong 3 cách** sau để chạy:
-
-#### 👉 Cách 3.1: Nhấp đúp chuột (1-Click) — Tiện lợi nhất
-Nhấp đúp chuột vào file:
-```
-start_hacom_legal.bat
-```
-
-#### 👉 Cách 3.2: Chạy bằng lệnh PowerShell / CMD tiêu chuẩn
-```powershell
-cd C:\KHMT\HacomHoldings\HacomLegalCopilot
+#### 🔹 Cách 1: Chạy trực tiếp trên máy trạm Windows (Development)
+```bash
 python app.py
 ```
+*Hoặc nhấp đúp vào file `start_hacom_legal.bat`.*
 
-#### 👉 Cách 3.3: Chạy chỉ định môi trường Conda nội bộ
-```powershell
-cd C:\KHMT\HacomHoldings\HacomLegalCopilot
-$env:HACOM_LLM_URL="http://localhost:50050"
-$env:HACOM_LEGAL_MODEL="qwen3:8b"
-C:\KHMT\HacomHolding\HacomKTKT\.conda-env\python.exe app.py
+#### 🔹 Cách 2: Treo chạy ngầm trên Server Linux (`admin123-PowerEdge-R760` / PM2)
+```bash
+cd ~/HacomLegalCopilot
+pm2 start app.py --name "hacom-legal" --interpreter /home/vinhnv/HacomLegalCopilot/.venv/bin/python
+pm2 save
+```
+
+#### 🔹 Cách 3: Mở đường link chia sẻ ngoài (Cloudflare Tunnel)
+```bash
+pm2 start "cloudflared tunnel --url http://localhost:8005" --name "hacom-cf"
+pm2 save
+pm2 logs hacom-cf --lines 20
 ```
 
 ---
 
 ## 🌐 ĐỊA CHỈ TRUY CẬP HỆ THỐNG
 
-Khi màn hình Terminal xuất hiện thông báo:  
-`INFO: Uvicorn running on http://127.0.0.1:8005 (Press CTRL+C to quit)`
+Sau khi khởi động, mở trình duyệt web và truy cập:
 
-Bạn mở trình duyệt web và truy cập:
-
-| Thành phần | Địa chỉ (URL) | Chức năng |
+| Môi trường | Địa chỉ (URL) | Ghi chú |
 | :--- | :--- | :--- |
-| **Giao diện Dashboard chính** | [http://127.0.0.1:8005/](http://127.0.0.1:8005/) | Màn hình Tra cứu RAG, Cảnh báo tác động và Đồ thị tri thức |
+| **Máy cục bộ (Localhost)** | [http://127.0.0.1:8005/](http://127.0.0.1:8005/) | Mặc định trên máy phát triển |
+| **Mạng Server Công ty** | `http://27.72.146.12:8005/` | Truy cập qua IP máy chủ PowerEdge R760 |
+| **Đường hầm Cloudflare** | `https://*.trycloudflare.com` | Link public mã hóa an toàn để test từ xa |
 
 ---
 
-## 📖 HƯỚNG DẪN KIỂM THỬ 3 CHỨC NĂNG CHÍNH
+## 📋 HƯỚNG DẪN SỬ DỤNG 3 CHỨC NĂNG CHÍNH
 
-### 1. 🔍 Tab 1: Tra cứu Pháp lý RAG (Verified Legal RAG)
-* **Cách dùng**: Chọn loại hình dự án (*KĐT, Nhà ở xã hội, Năng lượng tái tạo, BĐS nghỉ dưỡng, Cụm công nghiệp*) ➔ Nhấp vào các câu hỏi gợi ý nhanh hoặc tự nhập câu hỏi ➔ Bấm **"Tra cứu ngay"**.
-* **Câu hỏi mẫu thử nghiệm**:
-  * `💡 Định mức lợi nhuận dự án Nhà ở xã hội là bao nhiêu %?` (AI sẽ trích dẫn Điều 85 Luật Nhà ở 2023 - mức tối đa 10%).
-  * `💡 Thủ tục bồi thường GPMB khi thu hồi đất quy định như thế nào?` (AI sẽ trích dẫn Luật Đất đai & NĐ 102/2024).
-  * `💡 Cơ chế mua bán điện trực tiếp DPPA theo Nghị định 80/2024` (AI sẽ phân tích cơ chế cho dự án điện gió).
+### 🔍 1. Tab 1: Tra cứu Pháp lý RAG (Verified Legal RAG)
+* **Mô tả**: Hỗ trợ chuyên viên và lãnh đạo hỏi đáp các tình huống pháp lý phức tạp.
+* **Tính năng**:
+  * Bộ lọc chuyên sâu theo 7 nhóm lĩnh vực: *Quy hoạch - Đất đai, Đầu tư - Đấu thầu, Nhà ở xã hội, BĐS Nghĩ dưỡng & KĐT, Xây dựng - Giấy phép, Năng lượng tái tạo, Môi trường - PCCC*.
+  * Thẻ gợi ý câu hỏi mẫu thông minh: Bấm trực tiếp để tự động điền và phân tích ngay.
+  * Thẻ trích dẫn căn cứ pháp lý (`Verified Source Cards`) hiển thị trích dẫn nguyên văn, số hiệu văn bản, ngày ban hành và ngày có hiệu lực.
+  * Tích hợp cơ chế **Universal Modal Viewer**: Bấm vào bất kỳ điều luật nào để đọc toàn văn văn bản gốc mà không cần mở file rời.
 
-### 2. 🚨 Tab 2: Cảnh báo Tác động Văn bản Mới
-* **Cách dùng**: Nhập số hiệu văn bản mới ban hành (*ví dụ: `71/2024/NĐ-CP` hoặc `102/2024/NĐ-CP`*) ➔ Bấm **"Phân tích tác động dự án"**.
-* **Kết quả**: Hệ thống tự động so khớp ma trận 7 dự án trọng điểm của HACOM (*KĐT K1, KĐT K2, Hacom GalaCity, Điện gió Hòa Thắng, Bình Sơn Resort...*) để đưa ra mức độ rủi ro (🔴 Đỏ / 🟡 Vàng / 🔵 Xanh) và khuyến nghị hành động.
+### 🚨 2. Tab 2: Cảnh báo Tác động Văn bản Luật Mới
+* **Mô tả**: Đánh giá đa chiều tác động của một luật/nghị định mới ban hành lên danh mục 7 dự án trọng điểm của HACOM (*KĐT K1, KĐT K2, Hacom GalaCity, Điện gió Hòa Thắng, KDL Bình Sơn Ocean Park, Cụm CN Tháp Chàm...*).
+* **Cơ chế phân cấp rủi ro (4 cấp độ)**:
+  * 🔴 **Đỏ (Rủi ro cao / Khẩn cấp)**: Ảnh hưởng trực tiếp đến nghĩa vụ tài chính, thủ tục điều chỉnh dự án hoặc điều kiện kinh doanh.
+  * 🟡 **Vàng (Cần theo dõi / Cảnh báo)**: Thay đổi về trình tự phê duyệt, yêu cầu cập nhật hồ sơ hoặc báo cáo bổ sung.
+  * 🟢 **Xanh lá (Thuận lợi / Đòn bẩy)**: Quy định tạo cơ chế thông thoáng, rút ngắn thời gian giải quyết thủ tục hoặc ưu đãi thuế/đất.
+  * 🔵 **Xanh dương (Thông tin / Tham chiếu)**: Thay đổi mang tính kỹ thuật, quy chuẩn nội bộ hoặc mở rộng phạm vi áp dụng.
 
-### 3. 🕸️ Tab 3: Đồ thị Tri thức & Xử lý Xung đột Pháp lý
-* **Cách dùng**: Nhấp vào tab **"Đồ thị tri thức"**.
-* **Kết quả**: Xem 16 Nodes (Văn bản), 10 Edges (Quan hệ `AMENDS`, `GUIDES`, `CONFLICT_WITH`) và các thẻ gợi ý văn bản ưu tiên áp dụng theo **Điều 156 Luật Ban hành VBQPPL 2015**.
-
----
-
-## ⚙️ CẤU HÌNH TÙY CHỌN (FILE `.env`)
-
-Hệ thống tự động đọc các cấu hình từ file `.env` (hoặc biến môi trường hệ thống):
-
-```env
-HACOM_LLM_URL=http://localhost:50050       # Địa chỉ máy chủ LLM Ollama qua SSH Tunnel
-HACOM_LEGAL_MODEL=qwen3:8b                 # Mô hình AI phục vụ (qwen3:8b hoặc qwen3:14b)
-HACOM_LLM_TIMEOUT=120                      # Thời gian chờ tối đa (giây)
-```
+### 🕸️ 3. Tab 3: Đồ thị Tri thức & Xử lý Xung đột Pháp lý
+* **Mô tả**: Trực quan hóa mối quan hệ giữa 19 văn bản quy phạm pháp luật nền tảng.
+* **Tính năng**:
+  * Hiển thị các mối quan hệ: `AMENDS` (Sửa đổi, bổ sung), `GUIDES` (Quy định chi tiết / hướng dẫn thi hành), `CONFLICT_WITH` (Xung đột quy định).
+  * Quy tắc ưu tiên theo Điều 156 Luật Ban hành VBQPPL 2015.
+  * Bấm trực tiếp vào các nút hoặc liên kết trên đồ thị để mở bảng tra cứu toàn văn điều luật tương ứng.
 
 ---
 
-## 📁 CẤU TRÚC MÃ NGUỒN DỰ ÁN
+## 📂 CẤU TRÚC MÃ NGUỒN DỰ ÁN
 
 ```
 HacomLegalCopilot/
-├── app.py                         # File khởi động chính máy chủ FastAPI + Uvicorn
-├── app_api.py                     # Định nghĩa RESTful API và giao diện Web HTML/CSS/JS
-├── verified_rag.py                # Bộ máy Tra cứu RAG 4 lớp có kiểm chứng & chống ảo giác
-├── alert_engine.py                # Động cơ đánh giá tác động văn bản mới lên các dự án HACOM
+├── app.py                         # Điểm khởi động chính máy chủ FastAPI + Uvicorn (:8005)
+├── app_api.py                     # Định nghĩa RESTful API và giao diện Web Dashboard HACOM
+├── verified_rag.py                # Bộ máy Tra cứu RAG 4 lớp kết nối HACOM Internal LLM
+├── alert_engine.py                # Động cơ đánh giá tác động 4 cấp độ lên dự án HACOM
+├── legal_precedence_engine.py     # Động cơ giải quyết xung đột theo Điều 156 Luật Ban hành VBQPPL
 ├── knowledge_graph.py             # Quản trị Đồ thị Tri thức pháp lý (Nodes, Edges, Conflicts)
-├── vector_store.py                # Kho dữ liệu Vector & Tìm kiếm lai thông minh (Smart Hybrid Search)
-├── pdf_parser.py                  # Module bóc tách cấu trúc Điều/Khoản từ 45 tệp PDF luật
-├── config.py                      # Quản lý đường dẫn và cấu hình toàn cục
+├── vector_store.py                # Kho chỉ mục Vector & Hybrid Search trên 1.181 chunks
+├── pdf_parser.py                  # Module bóc tách cấu trúc Chương/Mục/Điều/Khoản từ PDF
+├── vietlex_client.py              # Module tích hợp tra cứu văn bản pháp luật
+├── config.py                      # Cấu hình đường dẫn và biến môi trường toàn cục
+├── test_company_llm.py            # Script kiểm thử kết nối Cổng LLM Tập đoàn HACOM
+├── API_LLM_HACOM.md               # Tài liệu đặc tả kỹ thuật Cổng LLM Tập đoàn
+├── BAO_CAO_NGHIEM_THU_TICH_HOP_LLM_HACOM.md # Báo cáo nghiệm thu kỹ thuật
+├── Report_LLMHacom.docx           # Báo cáo nghiệm thu định dạng Microsoft Word gửi Lãnh đạo
 ├── requirements.txt               # Danh sách thư viện Python phụ thuộc
 ├── start_hacom_legal.bat          # Kịch bản khởi động 1-Click trên Windows
-├── README.md                      # Tài liệu hướng dẫn sử dụng và chuyển giao dự án
+├── .env.example                   # Mẫu cấu hình biến môi trường chuẩn
+├── .gitignore                     # Cấu hình loại trừ tệp nhạy cảm và cache khi đẩy Git
 └── data/
-    ├── legal_knowledge_graph.json # Dữ liệu đồ thị 16 Nodes, 10 Edges, 4 Xung đột pháp lý
-    └── legal_vector_store/        # Cơ sở dữ liệu 1,145 Chunks đã được lập chỉ mục
+    ├── legal_knowledge_graph.json # Dữ liệu đồ thị tri thức (19 nodes, các quan hệ văn bản)
+    └── legal_vector_store/
+        └── legal_chunks_index.json # 1.181 chunks điều khoản đã được chuẩn hóa và số hóa 100%
 ```
 
 ---
-*© 2026 Tập đoàn HACOM Holdings. Tài liệu phục vụ nội bộ Ban Pháp chế và Bộ phận Công nghệ.*
+
+## 🛡️ AN TOÀN THÔNG TIN & BẢO MẬT
+
+1. **Bảo vệ API Key**: Tệp `.env` chứa chuỗi khóa `HACOM_LLM_KEY` được đưa vào `.gitignore` và không bao giờ đẩy lên kho mã nguồn công khai.
+2. **Hạ tầng On-Premise**: Toàn bộ luồng suy luận của AI chạy trên hạ tầng máy chủ GPU của HACOM Holdings (`ai.hacomholdings.com.vn`), tuân thủ 100% chính sách bảo mật thông tin nội bộ của Tập đoàn.
+
+---
+*© 2026 Tập đoàn HACOM Holdings. Tài liệu phục vụ nội bộ Ban Pháp chế Dự án và Ban Công nghệ Thông tin.*
